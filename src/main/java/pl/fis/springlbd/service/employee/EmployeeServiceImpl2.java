@@ -7,9 +7,11 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pl.fis.springlbd.entity.employee.Employee;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Profile("prod")
 @Service
@@ -23,8 +25,8 @@ public class EmployeeServiceImpl2 implements EmployeeService{
     @Value("${project.suffix}")
     private String suffix;
     @Override
-    public List findAll() {
-        return null;
+    public List<Employee> findAll() {
+        return new ArrayList<>(employees.values());
     }
 
     @Override

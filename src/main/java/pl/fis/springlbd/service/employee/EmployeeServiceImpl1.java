@@ -1,15 +1,15 @@
 package pl.fis.springlbd.service.employee;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pl.fis.springlbd.entity.employee.Employee;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
@@ -25,7 +25,7 @@ public class EmployeeServiceImpl1 implements EmployeeService {
 
     @Override
     public List findAll() {
-        return null;
+        return new ArrayList<>(employees.values());
     }
 
     @Override
