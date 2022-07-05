@@ -1,4 +1,4 @@
-package pl.fis.springlbd.controller;
+package pl.fis.springlbd.controller.employee;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
