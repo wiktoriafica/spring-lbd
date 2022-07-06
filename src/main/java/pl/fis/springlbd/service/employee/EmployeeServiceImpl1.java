@@ -4,16 +4,18 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import pl.fis.springlbd.entity.employee.Employee;
+import pl.fis.springlbd.service.team.TeamService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Profile("dev")
 @Service
 public class EmployeeServiceImpl1 implements EmployeeService {
+
+    private final TeamService teamService;
 
     @Value("${project.prefix}")
     private String prefix;
@@ -22,6 +24,10 @@ public class EmployeeServiceImpl1 implements EmployeeService {
     private String suffix;
 
     private Map<Long, Employee> employees = new HashMap<>();
+
+    public EmployeeServiceImpl1(TeamService teamService) {
+        this.teamService = teamService;
+    }
 
     @Override
     public List findAll() {
