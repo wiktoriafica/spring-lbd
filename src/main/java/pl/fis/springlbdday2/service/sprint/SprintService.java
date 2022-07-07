@@ -4,4 +4,5 @@ import pl.fis.springlbdday2.entity.sprint.Sprint;
 
 public interface SprintService {
     void addSprint(Sprint sprint);
+    Sprint getSprintById(Long id);
 }
