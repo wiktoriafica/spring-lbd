@@ -5,24 +5,28 @@ import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 
 import javax.persistence.*;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
 @Table(name = "sprints")
 public class Sprint {
     @Id
-    @GeneratedValue
+    @Column(name = "sprint_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(nullable = false, name = "name")
+    @NotNull
+    private String name;
 
     @Column(nullable = false, name = "start_date")
     @NotNull
-    private Date startDate;
+    private LocalDate startDate;
     @Column(nullable = false, name = "end_date")
     @NotNull
-    private Date endDate;
-    @Column(nullable = false, name = "goal_description")
-    @NotNull
+    private LocalDate endDate;
+    @Column(name = "goal_description")
     private String goalDescription;
     @Column(nullable = false, name = "status")
     @NotNull
@@ -44,19 +48,27 @@ public class Sprint {
         this.id = id;
     }
 
-    public Date getStartDate() {
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public LocalDate getStartDate() {
         return startDate;
     }
 
-    public void setStartDate(Date startDate) {
+    public void setStartDate(LocalDate startDate) {
         this.startDate = startDate;
     }
 
-    public Date getEndDate() {
+    public LocalDate getEndDate() {
         return endDate;
     }
 
-    public void setEndDate(Date endDate) {
+    public void setEndDate(LocalDate endDate) {
         this.endDate = endDate;
     }
 
