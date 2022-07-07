@@ -9,7 +9,6 @@ import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.exception.InvalidDataException;
 import pl.fis.springlbdday2.repository.userstory.UserStoryRepository;
-import pl.fis.springlbdday2.service.sprint.SprintServiceImpl;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
@@ -37,6 +36,11 @@ public class UserStoryServiceImpl implements UserStoryService{
     public UserStory getUserStoryById(Long id) {
         return userStoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User " +
                 "story with id " + id + " does not exists"));
+    }
+
+    @Override
+    public void deleteUserStoryById(Long id) {
+        userStoryRepository.deleteById(id);
     }
 
     @Transactional(rollbackFor = InvalidDataException.class)

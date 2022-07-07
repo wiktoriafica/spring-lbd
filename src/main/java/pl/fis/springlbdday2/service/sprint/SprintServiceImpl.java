@@ -6,12 +6,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
+import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.exception.InvalidDataException;
 import pl.fis.springlbdday2.repository.sprint.SprintRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class SprintServiceImpl implements SprintService {
@@ -35,6 +37,27 @@ public class SprintServiceImpl implements SprintService {
     public Sprint getSprintById(Long id) {
         return sprintRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity " +
                 "with id " + id + " does not exists"));
+    }
+
+    @Override
+    @Transactional
+    public List<UserStory> getUsersStoriesBySprintId(Long id) {
+        return sprintRepository.findUserStoriesBySprintId(id);
+    }
+
+    @Override
+    public List<Sprint> getSprintsFromGivenTime(LocalDate startDate, LocalDate endDate) {
+        return sprintRepository.findByStartDateBetween(startDate, endDate);
+    }
+
+    @Override
+    public Integer getStoryPointsFromSprint(Long id) {
+        return sprintRepository.getStoryPointsFromSprint(id);
+    }
+
+    @Override
+    public void deleteSprintById(Long id) {
+        sprintRepository.deleteById(id);
     }
 
     //TODO: ex. 7, transaction is not rolled back and I don't know how to make it work

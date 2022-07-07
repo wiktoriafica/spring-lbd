@@ -6,4 +6,6 @@ public interface UserStoryService {
     void addUserStory(UserStory userStory);
 
     UserStory getUserStoryById(Long id);
+
+    void deleteUserStoryById(Long id);
 }
