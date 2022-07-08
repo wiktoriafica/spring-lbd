@@ -24,11 +24,14 @@ public class UserStoryServiceImpl implements UserStoryService{
     }
 
     @Override
-    public void addUserStory(UserStory userStory) throws InvalidDataException {
+    public UserStory addUserStory(UserStory userStory) throws InvalidDataException {
         if(userStory.getStatus() == null)
             userStory.setStatus(UserStoryStatus.TO_DO);
-        if(userStory.getName() != null && userStory.getDescription() != null)
+        if(userStory.getName() != null && userStory.getDescription() != null) {
             userStoryRepository.save(userStory);
+            return userStory;
+        }
+
         else throw new InvalidDataException("Violations of constraints in user stories");
     }
 

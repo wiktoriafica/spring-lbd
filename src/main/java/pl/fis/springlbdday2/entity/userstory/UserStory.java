@@ -26,10 +26,6 @@ public class UserStory {
     @Column(name = "story_points")
     private Integer storyPoints;
 
-    @Column(name = "attachments")
-    @Lob
-    private List<Byte> attachments;
-
     @Column(nullable = false, name = "status")
     @NotNull
     @Enumerated(EnumType.STRING)
@@ -37,6 +33,19 @@ public class UserStory {
 
     @ManyToMany(mappedBy = "userStories")
     private List<Sprint> sprints;
+
+    public UserStory() {}
+    public UserStory(String name,
+                     String description,
+                     Integer storyPoints,
+                     UserStoryStatus status,
+                     List<Sprint> sprints) {
+        this.name = name;
+        this.description = description;
+        this.storyPoints = storyPoints;
+        this.status = status;
+        this.sprints = sprints;
+    }
 
     public Long getId() {
         return id;
@@ -68,14 +77,6 @@ public class UserStory {
 
     public void setStoryPoints(Integer storyPoints) {
         this.storyPoints = storyPoints;
-    }
-
-    public List<Byte> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<Byte> attachments) {
-        this.attachments = attachments;
     }
 
     public UserStoryStatus getStatus() {

@@ -2,13 +2,17 @@ package pl.fis.springlbdday2.service.sprint;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
+import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.exception.InvalidDataException;
 import pl.fis.springlbdday2.repository.sprint.SprintRepository;
+import pl.fis.springlbdday2.service.userstory.UserStoryService;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
@@ -18,9 +22,11 @@ import java.util.List;
 @Service
 public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
+    private final UserStoryService userStoryService;
     private static final Logger LOGGER = LoggerFactory.getLogger(SprintServiceImpl.class);
-    public SprintServiceImpl(SprintRepository sprintRepository) {
+    public SprintServiceImpl(SprintRepository sprintRepository, UserStoryService userStoryService) {
         this.sprintRepository = sprintRepository;
+        this.userStoryService = userStoryService;
     }
 
     @Override
@@ -31,6 +37,27 @@ public class SprintServiceImpl implements SprintService {
                 sprint.getEndDate().isAfter(sprint.getStartDate()))
             sprintRepository.save(sprint);
         else throw new InvalidDataException("Violations of constraints in sprints");
+    }
+
+    @Override
+    @Transactional(rollbackFor = InvalidDataException.class)
+    public void addSprintWithUserStories() throws InvalidDataException  {
+        UserStory userStory1 = new UserStory();
+        userStory1.setStoryPoints(12);
+        userStory1.setName("Story 1");
+        userStory1.setDescription("This is user story 1");
+        userStory1.setStatus(UserStoryStatus.IN_PROGRESS);
+
+        UserStory userStory2 = new UserStory();
+        userStory2.setStoryPoints(23);
+        userStory2.setName("Story 2");
+        userStory2.setDescription("This is user story 2");
+        userStory2.setStatus(UserStoryStatus.TO_DO);
+
+        sprintRepository.save(new Sprint("Another sprint nr 1",
+                LocalDate.now(), LocalDate.now(), "Sprint goal",
+                SprintStatus.IN_PROGRESS, List.of(userStoryService.addUserStory(userStory1),
+                userStoryService.addUserStory(userStory2))));
     }
 
     @Override
@@ -60,7 +87,16 @@ public class SprintServiceImpl implements SprintService {
         sprintRepository.deleteById(id);
     }
 
-    //TODO: ex. 7, transaction is not rolled back and I don't know how to make it work
+    @Override
+    public Page<Sprint> getPaginatedAndSortedSprints(Pageable page) {
+        return sprintRepository.findAll(page);
+    }
+
+    @Override
+    public LocalDate getLastStartDate() {
+        return sprintRepository.getLastStartDate();
+    }
+
     @Transactional(rollbackFor = InvalidDataException.class)
     public void addSprints() throws InvalidDataException {
         Sprint sprint = new Sprint();
@@ -79,13 +115,17 @@ public class SprintServiceImpl implements SprintService {
         addSprint(sprint2);
     }
 
+
     @PostConstruct
     public void postConstruct() {
         try {
+            LOGGER.info("Creating sprint with user stories...");
+            addSprintWithUserStories();
             LOGGER.info("Creating sprints...");
             addSprints();
         } catch(Exception exception) {
             LOGGER.info("Error occurred while adding sprint to db");
         }
+
     }
 }

@@ -5,6 +5,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
@@ -102,24 +105,24 @@ public class SprintServiceTest {
         Sprint sprint = new Sprint();
         sprint.setName("Sprint 1");
         sprint.setStatus(SprintStatus.PENDING);
-        sprint.setStartDate(LocalDate.now().plusDays(100));
-        sprint.setEndDate(LocalDate.now().plusDays(114));
+        sprint.setStartDate(LocalDate.now().plusDays(205));
+        sprint.setEndDate(LocalDate.now().plusDays(214));
         Sprint sprint2 = new Sprint();
         sprint2.setName("Sprint 2");
         sprint2.setStatus(SprintStatus.PENDING);
-        sprint2.setStartDate(LocalDate.now().plusDays(110));
-        sprint2.setEndDate(LocalDate.now().plusDays(120));
+        sprint2.setStartDate(LocalDate.now().plusDays(201));
+        sprint2.setEndDate(LocalDate.now().plusDays(212));
         Sprint sprint3 = new Sprint();
         sprint3.setName("Sprint 3");
         sprint3.setStatus(SprintStatus.PENDING);
-        sprint3.setStartDate(LocalDate.now().plusDays(99));
-        sprint3.setEndDate(LocalDate.now().plusDays(105));
+        sprint3.setStartDate(LocalDate.now().plusDays(200));
+        sprint3.setEndDate(LocalDate.now().plusDays(214));
         sprintService.addSprint(sprint);
         sprintService.addSprint(sprint2);
         sprintService.addSprint(sprint3);
 
         List<Sprint> sprints = sprintService.getSprintsFromGivenTime(LocalDate.now().
-                plusDays(90), LocalDate.now().plusDays(110));
+                plusDays(200), LocalDate.now().plusDays(214));
 
         sprintService.deleteSprintById(sprint.getId());
         sprintService.deleteSprintById(sprint2.getId());
@@ -174,5 +177,14 @@ public class SprintServiceTest {
         userStoryService.deleteUserStoryById(userStory3.getId());
 
         assertEquals(points, retrievedPoints);
+    }
+
+    @Test
+    public void givenSprints_whenGettingPaginatedAndSortedByDate_thenSuccess() {
+        Page<Sprint> sprints = sprintService
+                .getPaginatedAndSortedSprints(PageRequest.of(0, 10,
+                        Sort.by(Sort.Order.desc("startDate"))));
+        assertEquals(10, sprints.getSize());
+        assertEquals(sprintService.getLastStartDate(), sprints.getContent().get(0).getStartDate());
     }
 }

@@ -40,6 +40,21 @@ public class Sprint {
             inverseJoinColumns = @JoinColumn(name = "user_story_id"))
     private List<UserStory> userStories;
 
+    public Sprint() {}
+    public Sprint(String name,
+                  LocalDate startDate,
+                  LocalDate endDate,
+                  String goalDescription,
+                  SprintStatus status,
+                  List<UserStory> userStories) {
+        this.name = name;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.goalDescription = goalDescription;
+        this.status = status;
+        this.userStories = userStories;
+    }
+
     public Long getId() {
         return id;
     }
