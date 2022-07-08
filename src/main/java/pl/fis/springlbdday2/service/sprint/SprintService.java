@@ -6,6 +6,7 @@ import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
 import pl.fis.springlbdday2.dto.sprint.SprintPostDto;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
+import pl.fis.springlbdday2.event.UserStoryCreatedEvent;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,4 +28,5 @@ public interface SprintService {
     List<SprintGetDto> getSprints(boolean tasks);
 
     void updateSprint(Long id, SprintPostDto sprintPostDto);
+    void userStoryCreatedEventHandler(UserStoryCreatedEvent userStoryCreatedEvent);
 }

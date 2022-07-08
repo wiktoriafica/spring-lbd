@@ -11,7 +11,7 @@ import java.util.List;
 public interface UserStoryService {
     UserStory addUserStory(UserStory userStory);
     void addUserStory(UserStoryPostDto userStoryPostDto, Long sprintId);
-
+    Long addUserStory(UserStoryPostDto userStoryPostDto);
     UserStory getUserStoryById(Long id);
 
     void deleteUserStoryById(Long id);

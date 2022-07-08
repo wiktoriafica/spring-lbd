@@ -61,6 +61,13 @@ public class UserStoryServiceImpl implements UserStoryService{
     }
 
     @Override
+    public Long addUserStory(UserStoryPostDto userStoryPostDto) {
+        UserStory userStory = userStoryMapper.convertDtoToUserStory(userStoryPostDto);
+        userStoryRepository.save(userStory);
+        return userStory.getId();
+    }
+
+    @Override
     public UserStory getUserStoryById(Long id) {
         return userStoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User " +
                 "story with id " + id + " does not exists"));

@@ -23,6 +23,9 @@ public interface SprintRepository extends PagingAndSortingRepository<Sprint, Lon
     @Query("SELECT max(s.startDate) FROM Sprint s")
     LocalDate getLastStartDate();
 
+    @Query("SELECT s FROM Sprint s WHERE s.status='PENDING' AND s.startDate=(SELECT " +
+            "max(s1.startDate) FROM Sprint s1 WHERE s1.status='PENDING')")
+    Sprint getNewestPendingSprint();
     @Override
     List<Sprint> findAll();
 }

@@ -2,6 +2,7 @@ package pl.fis.springlbdday2.service.sprint;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,13 @@ import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
+import pl.fis.springlbdday2.event.UserStoryCreatedEvent;
 import pl.fis.springlbdday2.exception.InvalidDataException;
 import pl.fis.springlbdday2.repository.sprint.SprintRepository;
 import pl.fis.springlbdday2.service.userstory.UserStoryService;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
-import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
@@ -40,7 +41,6 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-
     public void addSprint(Sprint sprint) throws InvalidDataException {
         if (sprint.getStartDate() != null && sprint.getEndDate() != null &&
                 sprint.getStatus() != null && sprint.getName() != null &&
@@ -135,6 +135,17 @@ public class SprintServiceImpl implements SprintService {
                 .orElseThrow(() -> new EntityNotFoundException("Entity " +
                         "with id " + id + " does not exists"));
         sprintRepository.save(sprint);
+    }
+
+    @Override
+    @EventListener
+    public void userStoryCreatedEventHandler(UserStoryCreatedEvent userStoryCreatedEvent) {
+        Sprint latestSprint = sprintRepository.getNewestPendingSprint();
+        UserStory userStory = userStoryService.getUserStoryById(userStoryCreatedEvent.getUserCreatedStoryId());
+        List<UserStory> userStories = sprintRepository.findUserStoriesBySprintId(latestSprint.getId());
+        userStories.add(userStory);
+        latestSprint.setUserStories(userStories);
+        sprintRepository.save(latestSprint);
     }
 
     @Transactional(rollbackFor = InvalidDataException.class)

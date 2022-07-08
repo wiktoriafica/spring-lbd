@@ -1,12 +1,13 @@
 package pl.fis.springlbdday2.controller.userstory;
 
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
+import pl.fis.springlbdday2.event.UserStoryCreatedEvent;
 import pl.fis.springlbdday2.service.userstory.UserStoryService;
 
 import java.util.List;
@@ -15,9 +16,12 @@ import java.util.List;
 @RequestMapping(path = "/userstories")
 public class UserStoryController {
     private final UserStoryService userStoryService;
+    private final ApplicationEventPublisher publisher;
 
-    public UserStoryController(UserStoryService userStoryService) {
+    public UserStoryController(UserStoryService userStoryService,
+                               ApplicationEventPublisher publisher) {
         this.userStoryService = userStoryService;
+        this.publisher = publisher;
     }
 
     @GetMapping
@@ -42,8 +46,11 @@ public class UserStoryController {
 
     @PostMapping
     public ResponseEntity<Void> addUserStory(@RequestBody UserStoryPostDto userStoryPostDto,
-                                             @RequestParam Long sprintId) {
-        userStoryService.addUserStory(userStoryPostDto, sprintId);
+                                             @RequestParam(required = false) Long sprintId) {
+        if(sprintId != null)
+            userStoryService.addUserStory(userStoryPostDto, sprintId);
+        else
+            publisher.publishEvent(new UserStoryCreatedEvent(userStoryService.addUserStory(userStoryPostDto)));
         return ResponseEntity.ok().build();
     }
 
