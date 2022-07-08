@@ -6,6 +6,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
+import pl.fis.springlbdday2.dto.sprint.SprintMapper;
+import pl.fis.springlbdday2.dto.sprint.SprintPostDto;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
@@ -16,17 +19,24 @@ import pl.fis.springlbdday2.service.userstory.UserStoryService;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
+import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
     private final UserStoryService userStoryService;
+    private final SprintMapper sprintMapper;
     private static final Logger LOGGER = LoggerFactory.getLogger(SprintServiceImpl.class);
-    public SprintServiceImpl(SprintRepository sprintRepository, UserStoryService userStoryService) {
+    public SprintServiceImpl(SprintRepository sprintRepository,
+                             UserStoryService userStoryService,
+                             SprintMapper sprintMapper) {
         this.sprintRepository = sprintRepository;
         this.userStoryService = userStoryService;
+        this.sprintMapper = sprintMapper;
     }
 
     @Override
@@ -78,6 +88,18 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
+    public List<SprintGetDto> getSprintsFromGivenTime(String startDate, String endDate) {
+        try {
+            LocalDate start = LocalDate.parse(startDate);
+            LocalDate end = LocalDate.parse(endDate);
+            return sprintRepository.findByStartDateBetween(start, end)
+                    .stream()
+                    .map(sprintMapper::getDtoFromSprint)
+                    .collect(Collectors.toList());
+        } catch (DateTimeParseException exception) { return null; }
+    }
+
+    @Override
     public Integer getStoryPointsFromSprint(Long id) {
         return sprintRepository.getStoryPointsFromSprint(id);
     }
@@ -95,6 +117,24 @@ public class SprintServiceImpl implements SprintService {
     @Override
     public LocalDate getLastStartDate() {
         return sprintRepository.getLastStartDate();
+    }
+
+    @Override
+    public List<SprintGetDto> getSprints(boolean tasks) {
+        return sprintRepository
+                .findAll()
+                .stream()
+                .map(tasks ? sprintMapper::getDtoFromSprintWithUserStories : sprintMapper::getDtoFromSprint)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateSprint(Long id, SprintPostDto sprintPostDto) {
+        Sprint sprint = sprintRepository.findById(id)
+                .map(foundSprint -> sprintMapper.updateSprintFromSprintPostDto(sprintPostDto, foundSprint))
+                .orElseThrow(() -> new EntityNotFoundException("Entity " +
+                        "with id " + id + " does not exists"));
+        sprintRepository.save(sprint);
     }
 
     @Transactional(rollbackFor = InvalidDataException.class)

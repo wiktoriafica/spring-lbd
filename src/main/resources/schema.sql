@@ -26,8 +26,10 @@ CREATE TABLE IF NOT EXISTS user_stories_in_sprints(
 	PRIMARY KEY(sprint_id, user_story_id),
 	CONSTRAINT fk_sprint 
 		FOREIGN KEY(sprint_id)
-			REFERENCES sprints(sprint_id),
+			REFERENCES sprints(sprint_id)
+                ON DELETE CASCADE,
 	CONSTRAINT fk_user_story 
 		FOREIGN KEY(user_story_id)
 			REFERENCES user_stories(user_story_id)
+                ON DELETE CASCADE
 );

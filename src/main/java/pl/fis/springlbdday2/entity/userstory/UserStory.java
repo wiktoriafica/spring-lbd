@@ -5,6 +5,7 @@ import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -32,7 +33,7 @@ public class UserStory {
     private UserStoryStatus status;
 
     @ManyToMany(mappedBy = "userStories")
-    private List<Sprint> sprints;
+    private List<Sprint> sprints = new ArrayList<>();
 
     public UserStory() {}
     public UserStory(String name,

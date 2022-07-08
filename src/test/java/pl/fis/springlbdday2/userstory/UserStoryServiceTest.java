@@ -6,15 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.exception.InvalidDataException;
 import pl.fis.springlbdday2.repository.userstory.UserStoryRepository;
 import pl.fis.springlbdday2.service.userstory.UserStoryService;
-
-import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

@@ -6,6 +6,7 @@ import pl.fis.springlbdday2.entity.userstory.UserStory;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -38,7 +39,7 @@ public class Sprint {
             name = "user_stories_in_sprints",
             joinColumns = @JoinColumn(name = "sprint_id"),
             inverseJoinColumns = @JoinColumn(name = "user_story_id"))
-    private List<UserStory> userStories;
+    private List<UserStory> userStories = new ArrayList<>();
 
     public Sprint() {}
     public Sprint(String name,
