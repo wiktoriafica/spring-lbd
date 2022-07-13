@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS user_stories(
 	name varchar(50) NOT NULL UNIQUE,
 	description text NOT NULL,
 	story_points int,
-	attachments text array,
+ 	attachments array,
 	status ENUM('TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE') NOT NULL
 );
 
