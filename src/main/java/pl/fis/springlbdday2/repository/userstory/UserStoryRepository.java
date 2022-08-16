@@ -13,6 +13,5 @@ public interface UserStoryRepository extends PagingAndSortingRepository<UserStor
     List<UserStory> getUserStoriesBySprintId(Long id);
     @Override
     List<UserStory> findAll();
-
     UserStory findByName(String name);
 }

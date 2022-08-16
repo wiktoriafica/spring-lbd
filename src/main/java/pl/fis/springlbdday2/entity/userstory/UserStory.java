@@ -1,6 +1,9 @@
 package pl.fis.springlbdday2.entity.userstory;
 
 import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 
@@ -10,6 +13,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "user_stories")
+@Getter
+@Setter
+@NoArgsConstructor
 public class UserStory {
     @Id
     @Column(name = "user_story_id")
@@ -34,8 +40,6 @@ public class UserStory {
 
     @ManyToMany(mappedBy = "userStories")
     private List<Sprint> sprints = new ArrayList<>();
-
-    public UserStory() {}
     public UserStory(String name,
                      String description,
                      Integer storyPoints,
@@ -45,54 +49,6 @@ public class UserStory {
         this.description = description;
         this.storyPoints = storyPoints;
         this.status = status;
-        this.sprints = sprints;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getStoryPoints() {
-        return storyPoints;
-    }
-
-    public void setStoryPoints(Integer storyPoints) {
-        this.storyPoints = storyPoints;
-    }
-
-    public UserStoryStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStoryStatus status) {
-        this.status = status;
-    }
-
-    public List<Sprint> getSprints() {
-        return sprints;
-    }
-
-    public void setSprints(List<Sprint> sprints) {
         this.sprints = sprints;
     }
 }

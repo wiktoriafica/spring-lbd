@@ -1,5 +1,6 @@
 package pl.fis.springlbdday2.controller.userstory;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -14,15 +15,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping(path = "/userstories")
+@RequiredArgsConstructor
 public class UserStoryController {
     private final UserStoryService userStoryService;
     private final ApplicationEventPublisher publisher;
-
-    public UserStoryController(UserStoryService userStoryService,
-                               ApplicationEventPublisher publisher) {
-        this.userStoryService = userStoryService;
-        this.publisher = publisher;
-    }
 
     @GetMapping
     public ResponseEntity<List<UserStoryGetDto>> getUserStories(

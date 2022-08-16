@@ -1,5 +1,6 @@
 package pl.fis.springlbdday2.controller.sprint;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
@@ -15,17 +16,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(path = "/sprints")
+@RequiredArgsConstructor
 public class SprintController {
 
     private final SprintService sprintService;
-    private final SprintMapper sprintMapper;
-
-    public SprintController(SprintService sprintService,
-                            SprintMapper sprintMapper) {
-        this.sprintService = sprintService;
-        this.sprintMapper = sprintMapper;
-    }
-
     @GetMapping
     public ResponseEntity<List<SprintGetDto>> getSprints(@RequestParam(required = false,
             defaultValue = "false") boolean tasks) {
@@ -45,7 +39,7 @@ public class SprintController {
                 .getSprintsFromGivenTime(start, end));
     }
 
-    @PutMapping(path = "{id}/status")
+    @PutMapping(path = "{id}/{status}")
     public ResponseEntity<Void> updateSprintStatus(@PathVariable Long id,
                                                    @PathVariable SprintStatus status) {
         SprintPostDto sprintPostDto = new SprintPostDto();

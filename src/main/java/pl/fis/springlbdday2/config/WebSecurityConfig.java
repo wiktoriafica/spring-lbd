@@ -1,30 +1,29 @@
 package pl.fis.springlbdday2.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
+    private final PasswordEncoder passwordEncoder;
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordSecurityConfig passwordSecurityConfig = new PasswordSecurityConfig();
-
         auth.inMemoryAuthentication()
                 .withUser("user")
-                .password(passwordSecurityConfig.passwordEncoder().encode("user"))
+                .password(passwordEncoder.encode("user"))
                 .roles("USER");
         auth.inMemoryAuthentication()
                 .withUser("admin")
-                .password(passwordSecurityConfig.passwordEncoder().encode("admin"))
+                .password(passwordEncoder.encode("admin"))
                 .roles("ADMIN");
     }
     @Override

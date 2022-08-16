@@ -1,5 +1,6 @@
 package pl.fis.springlbdday2.service.employee;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pl.fis.springlbdday2.entity.employee.Employee;
 import pl.fis.springlbdday2.repository.employee.EmployeeRepository;
@@ -8,13 +9,10 @@ import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
     private final EmployeeRepository employeeRepository;
-
-    public EmployeeServiceImpl(EmployeeRepository employeeRepository) {
-        this.employeeRepository = employeeRepository;
-    }
 
     @Override
     public List<Employee> getAllEmployees() {

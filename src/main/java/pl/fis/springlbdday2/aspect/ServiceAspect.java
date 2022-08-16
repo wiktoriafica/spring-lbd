@@ -1,30 +1,29 @@
 package pl.fis.springlbdday2.aspect;
 
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Aspect
 @Component
+@Slf4j
 public class ServiceAspect {
-    private static final Logger LOGGER = LoggerFactory.getLogger(ServiceAspect.class);
 
     @Around("execution(* pl.fis.springlbdday2.service..*.*(..))")
     public Object logCallingServiceMethods(ProceedingJoinPoint joinPoint) {
         Object[] arguments = joinPoint.getArgs();
         Object value = joinPoint.getArgs()[0];
         try {
-            LOGGER.info("Passed arguments:");
+            log.info("Passed arguments:");
             for(Object argument : arguments)
-              LOGGER.info("Argument: " + argument);
+                log.info("Argument: " + argument);
             value = joinPoint.proceed();
-            LOGGER.info("Returned value: " + value);
+            log.info("Returned value: " + value);
             return value;
         } catch(Throwable exception) {
-            LOGGER.info("Error occurred while proceeding the service method.");
+            log.info("Error occurred while proceeding the service method.");
             return value;
         }
     }

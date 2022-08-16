@@ -1,6 +1,9 @@
 package pl.fis.springlbdday2.entity.sprint;
 
 import com.sun.istack.NotNull;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 
@@ -11,6 +14,9 @@ import java.util.List;
 
 @Entity
 @Table(name = "sprints")
+@Getter
+@Setter
+@NoArgsConstructor
 public class Sprint {
     @Id
     @Column(name = "sprint_id")
@@ -41,7 +47,6 @@ public class Sprint {
             inverseJoinColumns = @JoinColumn(name = "user_story_id"))
     private List<UserStory> userStories = new ArrayList<>();
 
-    public Sprint() {}
     public Sprint(String name,
                   LocalDate startDate,
                   LocalDate endDate,
@@ -53,62 +58,6 @@ public class Sprint {
         this.endDate = endDate;
         this.goalDescription = goalDescription;
         this.status = status;
-        this.userStories = userStories;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public LocalDate getStartDate() {
-        return startDate;
-    }
-
-    public void setStartDate(LocalDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public LocalDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(LocalDate endDate) {
-        this.endDate = endDate;
-    }
-
-    public String getGoalDescription() {
-        return goalDescription;
-    }
-
-    public void setGoalDescription(String goalDescription) {
-        this.goalDescription = goalDescription;
-    }
-
-    public SprintStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(SprintStatus status) {
-        this.status = status;
-    }
-
-    public List<UserStory> getUserStories() {
-        return userStories;
-    }
-
-    public void setUserStories(List<UserStory> userStories) {
         this.userStories = userStories;
     }
 }

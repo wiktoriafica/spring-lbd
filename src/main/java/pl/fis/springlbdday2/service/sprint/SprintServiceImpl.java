@@ -1,7 +1,7 @@
 package pl.fis.springlbdday2.service.sprint;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -27,19 +27,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor
 public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
     private final UserStoryService userStoryService;
     private final SprintMapper sprintMapper;
-    private static final Logger LOGGER = LoggerFactory.getLogger(SprintServiceImpl.class);
-    public SprintServiceImpl(SprintRepository sprintRepository,
-                             UserStoryService userStoryService,
-                             SprintMapper sprintMapper) {
-        this.sprintRepository = sprintRepository;
-        this.userStoryService = userStoryService;
-        this.sprintMapper = sprintMapper;
-    }
-
     @Override
     public void addSprint(Sprint sprint) throws InvalidDataException {
         if (sprint.getStartDate() != null && sprint.getEndDate() != null &&
@@ -101,11 +94,15 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     public Integer getStoryPointsFromSprint(Long id) {
+        if(!sprintRepository.existsById(id))
+            throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         return sprintRepository.getStoryPointsFromSprint(id);
     }
 
     @Override
     public void deleteSprintById(Long id) {
+        if(!sprintRepository.existsById(id))
+            throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         sprintRepository.deleteById(id);
     }
 
@@ -132,7 +129,7 @@ public class SprintServiceImpl implements SprintService {
     public void updateSprint(Long id, SprintPostDto sprintPostDto) {
         Sprint sprint = sprintRepository.findById(id)
                 .map(foundSprint -> sprintMapper.updateSprintFromSprintPostDto(sprintPostDto, foundSprint))
-                .orElseThrow(() -> new EntityNotFoundException("Entity " +
+                .orElseThrow(() -> new EntityNotFoundException("Sprint " +
                         "with id " + id + " does not exists"));
         sprintRepository.save(sprint);
     }
@@ -170,12 +167,12 @@ public class SprintServiceImpl implements SprintService {
     @PostConstruct
     public void postConstruct() {
         try {
-            LOGGER.info("Creating sprint with user stories...");
+            log.info("Creating sprint with user stories...");
             addSprintWithUserStories();
-            LOGGER.info("Creating sprints...");
+            log.info("Creating sprints...");
             addSprints();
         } catch(Exception exception) {
-            LOGGER.info("Error occurred while adding sprint to db");
+            log.info("Error occurred while adding sprint to db");
         }
 
     }

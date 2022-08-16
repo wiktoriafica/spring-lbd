@@ -1,5 +1,7 @@
 package pl.fis.springlbdday2.entity.employeeroleinteam;
 
+import lombok.Getter;
+import lombok.Setter;
 import pl.fis.springlbdday2.entity.employee.Employee;
 import pl.fis.springlbdday2.entity.enums.EmployeeRole;
 import pl.fis.springlbdday2.entity.team.Team;
@@ -8,6 +10,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "employee_role_in_team")
+@Getter
+@Setter
 public class EmployeeRoleInTeam {
 
     @EmbeddedId

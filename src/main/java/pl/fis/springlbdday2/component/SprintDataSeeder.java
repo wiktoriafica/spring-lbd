@@ -1,5 +1,6 @@
 package pl.fis.springlbdday2.component;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -14,16 +15,11 @@ import java.util.List;
 
 @Component
 @Order(1)
+@RequiredArgsConstructor
 public class SprintDataSeeder implements CommandLineRunner {
 
     private final SprintService sprintService;
     private final UserStoryService userStoryService;
-
-    public SprintDataSeeder(SprintService sprintService,
-                            UserStoryService userStoryService) {
-        this.sprintService = sprintService;
-        this.userStoryService = userStoryService;
-    }
 
     @Override
     public void run(String... args) throws Exception {

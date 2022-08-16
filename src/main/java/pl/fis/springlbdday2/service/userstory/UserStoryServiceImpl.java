@@ -1,8 +1,7 @@
 package pl.fis.springlbdday2.service.userstory;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,19 +21,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class UserStoryServiceImpl implements UserStoryService{
     private final UserStoryRepository userStoryRepository;
     private final UserStoryMapper userStoryMapper;
     private final SprintRepository sprintRepository;
-    private static final Logger LOGGER = LoggerFactory.getLogger(UserStoryServiceImpl.class);
-
-    public UserStoryServiceImpl(UserStoryRepository userStoryRepository,
-                                UserStoryMapper userStoryMapper,
-                                SprintRepository sprintRepository) {
-        this.userStoryRepository = userStoryRepository;
-        this.userStoryMapper = userStoryMapper;
-        this.sprintRepository = sprintRepository;
-    }
 
     @Override
     public UserStory addUserStory(UserStory userStory) throws InvalidDataException {
@@ -44,7 +36,6 @@ public class UserStoryServiceImpl implements UserStoryService{
             userStoryRepository.save(userStory);
             return userStory;
         }
-
         else throw new InvalidDataException("Violations of constraints in user stories");
     }
 
@@ -75,6 +66,8 @@ public class UserStoryServiceImpl implements UserStoryService{
 
     @Override
     public List<UserStoryGetDto> getUsersStoriesBySprintId(Long id) {
+        if(!sprintRepository.existsById(id))
+            throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         return userStoryRepository.getUserStoriesBySprintId(id)
                 .stream()
                 .map(userStoryMapper::getUserStoryGetDtoFromUserStory)
@@ -107,6 +100,8 @@ public class UserStoryServiceImpl implements UserStoryService{
 
     @Override
     public void deleteUserStoryById(Long id) {
+        if(!userStoryRepository.existsById(id))
+            throw new EntityNotFoundException(String.format("User story with id %d does not exists", id));
         userStoryRepository.deleteById(id);
     }
 
@@ -135,10 +130,10 @@ public class UserStoryServiceImpl implements UserStoryService{
     @PostConstruct
     public void postConstruct() {
         try {
-            LOGGER.info("Creating user stories...");
+            log.info("Creating user stories...");
             addUserStories();
         } catch(Exception exception) {
-            LOGGER.info("Error occurred while adding user story to db");
+            log.info("Error occurred while adding user story to db");
         }
     }
 }
