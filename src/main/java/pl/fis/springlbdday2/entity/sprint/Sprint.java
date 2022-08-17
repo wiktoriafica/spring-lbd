@@ -35,7 +35,7 @@ public class Sprint {
     private LocalDate endDate;
     @Column(name = "goal_description")
     private String goalDescription;
-    @Column(nullable = false, name = "status")
+    @Column(nullable = false, name = "sprint_status")
     @NotNull
     @Enumerated(EnumType.STRING)
     private SprintStatus status;

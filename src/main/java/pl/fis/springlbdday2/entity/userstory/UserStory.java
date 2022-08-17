@@ -33,10 +33,14 @@ public class UserStory {
     @Column(name = "story_points")
     private Integer storyPoints;
 
-    @Column(nullable = false, name = "status")
+    @Column(nullable = false, name = "user_story_status")
     @NotNull
     @Enumerated(EnumType.STRING)
     private UserStoryStatus status;
+
+    @Column(name = "attachments")
+    @Lob
+    private byte[] attachments;
 
     @ManyToMany(mappedBy = "userStories")
     private List<Sprint> sprints = new ArrayList<>();

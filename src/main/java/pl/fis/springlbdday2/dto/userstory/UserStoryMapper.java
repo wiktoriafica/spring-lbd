@@ -11,6 +11,7 @@ public interface UserStoryMapper {
     UserStoryDto getDtoFromUserStory(UserStory userStory);
 
     @Mapping(target = "sprints", ignore = true)
+    @Mapping(target = "attachments", source = "attachments")
     UserStoryGetDto getUserStoryGetDtoFromUserStory(UserStory userStory);
     UserStory convertDtoToUserStory(UserStoryPostDto userStoryPostDto);
 }

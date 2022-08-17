@@ -42,6 +42,8 @@ public class UserStoryServiceImpl implements UserStoryService{
     @Override
     public void addUserStory(UserStoryPostDto userStoryPostDto, Long sprintId) {
         UserStory userStory = userStoryMapper.convertDtoToUserStory(userStoryPostDto);
+        if(userStory.getStatus() == null)
+            userStory.setStatus(UserStoryStatus.TO_DO);
         userStoryRepository.save(userStory);
         Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() ->
                 new EntityNotFoundException("Sprint with id " + sprintId + " does not exists"));
@@ -54,6 +56,8 @@ public class UserStoryServiceImpl implements UserStoryService{
     @Override
     public Long addUserStory(UserStoryPostDto userStoryPostDto) {
         UserStory userStory = userStoryMapper.convertDtoToUserStory(userStoryPostDto);
+        if(userStory.getStatus() == null)
+            userStory.setStatus(UserStoryStatus.TO_DO);
         userStoryRepository.save(userStory);
         return userStory.getId();
     }

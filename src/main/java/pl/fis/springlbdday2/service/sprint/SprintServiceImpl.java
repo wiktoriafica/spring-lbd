@@ -23,6 +23,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,18 +34,27 @@ public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
     private final UserStoryService userStoryService;
     private final SprintMapper sprintMapper;
-    @Override
-    public void addSprint(Sprint sprint) throws InvalidDataException {
-        if (sprint.getStartDate() != null && sprint.getEndDate() != null &&
-                sprint.getStatus() != null && sprint.getName() != null &&
-                sprint.getEndDate().isAfter(sprint.getStartDate()))
-            sprintRepository.save(sprint);
-        else throw new InvalidDataException("Violations of constraints in sprints");
+
+    private void validateSprint(Sprint sprint) {
+        if (sprint.getStartDate() == null || sprint.getEndDate() == null ||
+                sprint.getStatus() == null || sprint.getName() == null)
+            throw new InvalidDataException("No necessary sprint data provided");
+        if (!sprint.getEndDate().isAfter(sprint.getStartDate()))
+            throw new InvalidDataException("End date cannot be earlier than start date");
+        if (Arrays.stream(SprintStatus.values()).noneMatch(sprint.getStatus()::equals))
+            throw new InvalidDataException("Wrong status provided");
     }
 
     @Override
     @Transactional(rollbackFor = InvalidDataException.class)
-    public void addSprintWithUserStories() throws InvalidDataException  {
+    public void addSprint(Sprint sprint) throws InvalidDataException {
+        validateSprint(sprint);
+        sprintRepository.save(sprint);
+    }
+
+    @Override
+    @Transactional(rollbackFor = InvalidDataException.class)
+    public void addSprintWithUserStories() throws InvalidDataException {
         UserStory userStory1 = new UserStory();
         userStory1.setStoryPoints(12);
         userStory1.setName("Story 1");
@@ -89,19 +99,21 @@ public class SprintServiceImpl implements SprintService {
                     .stream()
                     .map(sprintMapper::getDtoFromSprint)
                     .collect(Collectors.toList());
-        } catch (DateTimeParseException exception) { return null; }
+        } catch (DateTimeParseException exception) {
+            return null;
+        }
     }
 
     @Override
     public Integer getStoryPointsFromSprint(Long id) {
-        if(!sprintRepository.existsById(id))
+        if (!sprintRepository.existsById(id))
             throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         return sprintRepository.getStoryPointsFromSprint(id);
     }
 
     @Override
     public void deleteSprintById(Long id) {
-        if(!sprintRepository.existsById(id))
+        if (!sprintRepository.existsById(id))
             throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         sprintRepository.deleteById(id);
     }
@@ -171,9 +183,8 @@ public class SprintServiceImpl implements SprintService {
             addSprintWithUserStories();
             log.info("Creating sprints...");
             addSprints();
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             log.info("Error occurred while adding sprint to db");
         }
-
     }
 }
