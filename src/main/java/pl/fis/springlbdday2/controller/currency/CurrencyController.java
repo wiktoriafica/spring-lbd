@@ -1,5 +1,6 @@
 package pl.fis.springlbdday2.controller.currency;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,13 +18,17 @@ public class CurrencyController {
 
     @GetMapping
     public ResponseEntity<RatesDto[]> getCurrencyRates() {
-        return restTemplate.getForEntity(baseUrl + "A/ " + LocalDate.now().minusDays(1) +
-                "?format=JSON", RatesDto[].class);
+        return ResponseEntity.ok().body(restTemplate
+                .getForEntity(String.format("%sA/%s?format=JSON",
+                baseUrl, LocalDate.now().minusDays(1)), RatesDto[].class)
+                .getBody());
     }
 
     @GetMapping(path = "last10")
     public ResponseEntity<RatesDto[]> getLastTenCurrencyRates() {
-        return restTemplate.getForEntity(baseUrl + "A/ " + LocalDate.now().minusDays(10) +
-                "/" + LocalDate.now() + "?format=JSON", RatesDto[].class);
+        return ResponseEntity.ok().body(restTemplate
+                .getForEntity(String.format("%sA/%s/%s?format=JSON", baseUrl,
+                LocalDate.now().minusDays(10), LocalDate.now()), RatesDto[].class)
+                .getBody());
     }
 }

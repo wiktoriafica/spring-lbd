@@ -5,12 +5,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
-import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
-import pl.fis.springlbdday2.service.sprint.SprintService;
 import pl.fis.springlbdday2.service.userstory.UserStoryService;
-
-import java.util.List;
 
 @Component
 @Order(0)
@@ -18,7 +14,6 @@ import java.util.List;
 public class UserStoriesDataSeeder implements CommandLineRunner {
 
     private final UserStoryService userStoryService;
-    private final SprintService sprintService;
 
     @Override
     public void run(String... args) throws Exception {

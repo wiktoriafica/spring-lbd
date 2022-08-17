@@ -24,7 +24,7 @@ public class ServiceAspect {
             return value;
         } catch(Throwable exception) {
             log.info("Error occurred while proceeding the service method.");
-            return value;
+            throw new RuntimeException(exception);
         }
     }
 }

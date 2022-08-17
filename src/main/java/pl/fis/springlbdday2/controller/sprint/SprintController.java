@@ -4,14 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
-import pl.fis.springlbdday2.dto.sprint.SprintMapper;
 import pl.fis.springlbdday2.dto.sprint.SprintPostDto;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.service.sprint.SprintService;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 
 @RestController
