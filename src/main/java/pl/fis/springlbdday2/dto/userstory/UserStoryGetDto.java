@@ -2,6 +2,7 @@ package pl.fis.springlbdday2.dto.userstory;
 
 import lombok.Data;
 import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
+import pl.fis.springlbdday2.entity.attachment.Attachment;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 
 import java.io.Serializable;
@@ -16,5 +17,6 @@ public class UserStoryGetDto implements Serializable {
 
     private UserStoryStatus status;
     private List<SprintGetDto> sprints;
-    private byte[] attachments;
+  //  private byte[] attachments;
+    private List<Attachment> attachments;
 }

@@ -4,6 +4,7 @@ import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import pl.fis.springlbdday2.entity.attachment.Attachment;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 
@@ -38,9 +39,12 @@ public class UserStory {
     @Enumerated(EnumType.STRING)
     private UserStoryStatus status;
 
-    @Column(name = "attachments")
-    @Lob
-    private byte[] attachments;
+    @OneToMany
+    @JoinTable(
+            name = "user_stories_attachments",
+            joinColumns = @JoinColumn(name = "user_story_id"),
+            inverseJoinColumns = @JoinColumn(name = "attachment_id"))
+    private List<Attachment> attachments; // = new ArrayList<>();
 
     @ManyToMany(mappedBy = "userStories")
     private List<Sprint> sprints = new ArrayList<>();
