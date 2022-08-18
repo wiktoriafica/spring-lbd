@@ -15,7 +15,13 @@ public class Attachment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "attachment")
+    @Column(name = "attachment", nullable = false)
     @Lob
     private byte[] attachment;
+
+    @Column(name = "content_type", nullable = false)
+    private String contentType;
+
+    @Column(name = "file_name", nullable = false)
+    private String fileName;
 }

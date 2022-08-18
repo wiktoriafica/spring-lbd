@@ -41,7 +41,9 @@ CREATE TABLE IF NOT EXISTS user_stories_in_sprints
 CREATE TABLE IF NOT EXISTS attachments
 (
     attachment_id bigint PRIMARY KEY AUTO_INCREMENT,
-    attachment    blob
+    attachment    blob,
+    content_type varchar(50),
+    file_name  varchar(50)
 );
 
 CREATE TABLE IF NOT EXISTS user_stories_attachments

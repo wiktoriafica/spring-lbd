@@ -5,9 +5,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pl.fis.springlbdday2.dto.attachment.AttachmentGetDto;
+import pl.fis.springlbdday2.dto.attachment.AttachmentMapper;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryMapper;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
+import pl.fis.springlbdday2.entity.attachment.Attachment;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
@@ -17,6 +20,8 @@ import pl.fis.springlbdday2.repository.userstory.UserStoryRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,6 +32,7 @@ public class UserStoryServiceImpl implements UserStoryService{
     private final UserStoryRepository userStoryRepository;
     private final UserStoryMapper userStoryMapper;
     private final SprintRepository sprintRepository;
+    private final AttachmentMapper attachmentMapper;
 
     @Override
     public UserStory addUserStory(UserStory userStory) throws InvalidDataException {
@@ -100,6 +106,15 @@ public class UserStoryServiceImpl implements UserStoryService{
         return userStoryMapper
                 .getUserStoryGetDtoFromUserStory
                         (userStoryRepository.findByName(name));
+    }
+
+    @Override
+    public AttachmentGetDto getUserStoryAttachment(Long userStoryId, Integer attachmentNumber) {
+        List<Attachment> attachments = getUserStoryById(userStoryId).getAttachments();
+        if(!attachments.isEmpty() && attachments.size() >= attachmentNumber)
+            return attachmentMapper.getDtoFromAttachment(attachments.get(attachmentNumber - 1));
+        throw new InvalidDataException("User story does not have any attachments" +
+                " or attachment with this number does not exists");
     }
 
     @Override

@@ -4,8 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pl.fis.springlbdday2.dto.attachment.AttachmentGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
 import pl.fis.springlbdday2.event.UserStoryCreatedEvent;
@@ -32,6 +35,16 @@ public class UserStoryController {
         return ResponseEntity.ok().body(userStoryService.getUserStoryById(id).getDescription());
     }
 
+    @GetMapping(path = "/{userStoryId}/attachments/{attachmentNumber}")
+    public ResponseEntity<byte[]> downloadUserStoryAttachment(@PathVariable Long userStoryId, @PathVariable Integer attachmentNumber){
+        AttachmentGetDto attachment = userStoryService.getUserStoryAttachment(userStoryId, attachmentNumber);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + attachment.getFileName())
+                .contentType(MediaType.valueOf(attachment.getContentType()))
+                .body(attachment.getAttachment());
+    }
+
+
     @GetMapping(path = "/sorted")
     public ResponseEntity<List<UserStoryGetDto>> getSortedAndPagedUserStories() {
         return ResponseEntity.ok().body(userStoryService
@@ -43,7 +56,7 @@ public class UserStoryController {
     @PostMapping
     public ResponseEntity<Void> addUserStory(@RequestBody UserStoryPostDto userStoryPostDto,
                                              @RequestParam(required = false) Long sprintId) {
-        if(sprintId != null)
+        if (sprintId != null)
             userStoryService.addUserStory(userStoryPostDto, sprintId);
         else
             publisher.publishEvent(new UserStoryCreatedEvent(userStoryService.addUserStory(userStoryPostDto)));

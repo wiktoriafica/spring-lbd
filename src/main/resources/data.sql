@@ -1,6 +1,7 @@
-INSERT INTO attachments(attachment) VALUES
-(FILE_READ('src/main/resources/image.jpg')),
-(FILE_READ('src/main/resources/text.txt'));
+INSERT INTO attachments(attachment, content_type, file_name) VALUES
+(FILE_READ('src/main/resources/image.png'), 'image/png', 'image.png'),
+(FILE_READ('src/main/resources/image.jpg'), 'image/jpeg', 'image.jpg'),
+(FILE_READ('src/main/resources/text.txt'), 'text/plain', 'text.txt');
 
 INSERT INTO sprints(name, start_date, end_date, goal_description, sprint_status) VALUES
 	('Server', '2022-05-21', '2022-06-15', 'To finish all tasks', 'FINISHED');
@@ -27,4 +28,4 @@ INSERT INTO user_stories(name, description, story_points, user_story_status) VAL
 	('Task4', 'Added fourth task', 15, 'DONE');
 SET @user_story_id = SELECT max(user_story_id) FROM user_stories;
 INSERT INTO user_stories_in_sprints VALUES(@sprint_id, @user_story_id);
-INSERT INTO user_stories_attachments(user_story_id, attachment_id) VALUES(@user_story_id, 2);
+INSERT INTO user_stories_attachments(user_story_id, attachment_id) VALUES(@user_story_id, 3);
