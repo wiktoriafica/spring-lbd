@@ -113,8 +113,8 @@ public class UserStoryServiceImpl implements UserStoryService {
         List<Attachment> attachments = getUserStoryById(userStoryId).getAttachments();
         if (!attachments.isEmpty() && attachments.size() >= attachmentNumber)
             return attachmentMapper.getDtoFromAttachment(attachments.get(attachmentNumber - 1));
-        throw new InvalidDataException("User story does not have any attachments" +
-                " or attachment with this number does not exists");
+        throw new InvalidDataException(String.format("User story does not have any attachments" +
+                " or attachment with number %d does not exists", attachmentNumber));
     }
 
     @Override

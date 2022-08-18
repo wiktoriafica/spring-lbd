@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
 import pl.fis.springlbdday2.dto.sprint.SprintPostDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
+import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.event.UserStoryCreatedEvent;
 
@@ -35,6 +36,7 @@ public interface SprintService {
     List<SprintGetDto> getSprints(boolean tasks);
 
     void updateSprint(Long id, SprintPostDto sprintPostDto);
+    void updateSprintStatus(Long id, SprintStatus status);
 
     void userStoryCreatedEventHandler(UserStoryCreatedEvent userStoryCreatedEvent);
 }

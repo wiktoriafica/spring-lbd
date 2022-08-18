@@ -36,6 +36,11 @@ public class UserStoryController {
         return ResponseEntity.ok().body(userStoryService.getUserStoryById(id).getDescription());
     }
 
+    @GetMapping(path = "/{id}")
+    public ResponseEntity<UserStoryGetDto> getUserStoryById(@PathVariable Long id) {
+        return ResponseEntity.ok().body(userStoryService.getUserStoryById(id));
+    }
+
     @GetMapping(path = "/{userStoryId}/attachments/{attachmentNumber}")
     public ResponseEntity<byte[]> downloadUserStoryAttachment(@PathVariable Long userStoryId, @PathVariable Integer attachmentNumber){
         AttachmentGetDto attachment = userStoryService.getUserStoryAttachment(userStoryId, attachmentNumber);

@@ -59,27 +59,6 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    @Transactional(rollbackFor = InvalidDataException.class)
-    public void addSprintWithUserStories() throws InvalidDataException {
-        UserStoryPostDto userStory1 = new UserStoryPostDto();
-        userStory1.setStoryPoints(12);
-        userStory1.setName("Story 1");
-        userStory1.setDescription("This is user story 1");
-        userStory1.setStatus(UserStoryStatus.IN_PROGRESS);
-
-        UserStoryPostDto userStory2 = new UserStoryPostDto();
-        userStory2.setStoryPoints(23);
-        userStory2.setName("Story 2");
-        userStory2.setDescription("This is user story 2");
-        userStory2.setStatus(UserStoryStatus.TO_DO);
-
-        sprintRepository.save(new Sprint("Another sprint nr 1",
-                LocalDate.now(), LocalDate.now(), "Sprint goal",
-                SprintStatus.IN_PROGRESS, List.of(userStoryService.addUserStory(userStory1),
-                userStoryService.addUserStory(userStory2))));
-    }
-
-    @Override
     @Transactional(readOnly = true, noRollbackFor = Exception.class)
     public SprintGetDto getSprintById(Long id) {
         return sprintMapper.getDtoFromSprintWithUserStories(sprintRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity " +
@@ -89,6 +68,8 @@ public class SprintServiceImpl implements SprintService {
     @Override
     @Transactional
     public List<UserStoryGetDto> getUsersStoriesBySprintId(Long id) {
+        if (!sprintRepository.existsById(id))
+            throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         return sprintRepository.findUserStoriesBySprintId(id)
                 .stream()
                 .map(userStoryMapper::getUserStoryGetDtoFromUserStory)
@@ -123,7 +104,8 @@ public class SprintServiceImpl implements SprintService {
     public Integer getStoryPointsFromSprint(Long id) {
         if (!sprintRepository.existsById(id))
             throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
-        return sprintRepository.getStoryPointsFromSprint(id);
+        Integer points = sprintRepository.getStoryPointsFromSprint(id);
+        return points != null ? points : 0;
     }
 
     @Override
@@ -168,6 +150,13 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
+    public void updateSprintStatus(Long id, SprintStatus status) {
+        SprintPostDto sprintPostDto = new SprintPostDto();
+        sprintPostDto.setStatus(status);
+        updateSprint(id, sprintPostDto);
+    }
+
+    @Override
     @EventListener
     public void userStoryCreatedEventHandler(UserStoryCreatedEvent userStoryCreatedEvent) {
         Sprint latestSprint = sprintRepository.getNewestPendingSprint();
@@ -176,6 +165,27 @@ public class SprintServiceImpl implements SprintService {
         userStories.add(userStory);
         latestSprint.setUserStories(userStories);
         sprintRepository.save(latestSprint);
+    }
+
+    @Override
+    @Transactional(rollbackFor = InvalidDataException.class)
+    public void addSprintWithUserStories() throws InvalidDataException {
+        UserStoryPostDto userStory1 = new UserStoryPostDto();
+        userStory1.setStoryPoints(12);
+        userStory1.setName("Story 1");
+        userStory1.setDescription("This is user story 1");
+        userStory1.setStatus(UserStoryStatus.IN_PROGRESS);
+
+        UserStoryPostDto userStory2 = new UserStoryPostDto();
+        userStory2.setStoryPoints(23);
+        userStory2.setName("Story 2");
+        userStory2.setDescription("This is user story 2");
+        userStory2.setStatus(UserStoryStatus.TO_DO);
+
+        sprintRepository.save(new Sprint("Another sprint nr 1",
+                LocalDate.now(), LocalDate.now(), "Sprint goal",
+                SprintStatus.IN_PROGRESS, List.of(userStoryService.addUserStory(userStory1),
+                userStoryService.addUserStory(userStory2))));
     }
 
     @Transactional(rollbackFor = InvalidDataException.class)
