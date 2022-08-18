@@ -44,10 +44,11 @@ public class UserStory {
             name = "user_stories_attachments",
             joinColumns = @JoinColumn(name = "user_story_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id"))
-    private List<Attachment> attachments; // = new ArrayList<>();
+    private List<Attachment> attachments = new ArrayList<>();
 
     @ManyToMany(mappedBy = "userStories")
     private List<Sprint> sprints = new ArrayList<>();
+
     public UserStory(String name,
                      String description,
                      Integer storyPoints,

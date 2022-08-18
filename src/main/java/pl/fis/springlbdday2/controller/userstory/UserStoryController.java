@@ -66,7 +66,7 @@ public class UserStoryController {
         if (sprintId != null)
             userStoryService.addUserStory(userStoryPostDto, sprintId);
         else
-            publisher.publishEvent(new UserStoryCreatedEvent(userStoryService.addUserStory(userStoryPostDto)));
+            publisher.publishEvent(new UserStoryCreatedEvent(userStoryService.addUserStory(userStoryPostDto).getId()));
         return ResponseEntity.ok().build();
     }
 

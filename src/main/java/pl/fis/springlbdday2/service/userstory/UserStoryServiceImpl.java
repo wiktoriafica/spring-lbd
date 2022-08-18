@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserStoryServiceImpl implements UserStoryService{
+public class UserStoryServiceImpl implements UserStoryService {
     private final UserStoryRepository userStoryRepository;
     private final UserStoryMapper userStoryMapper;
     private final SprintRepository sprintRepository;
@@ -38,20 +38,9 @@ public class UserStoryServiceImpl implements UserStoryService{
     private final AttachmentRepository attachmentRepository;
 
     @Override
-    public UserStory addUserStory(UserStory userStory) throws InvalidDataException {
-        if(userStory.getStatus() == null)
-            userStory.setStatus(UserStoryStatus.TO_DO);
-        if(userStory.getName() != null && userStory.getDescription() != null) {
-            userStoryRepository.save(userStory);
-            return userStory;
-        }
-        else throw new InvalidDataException("Violations of constraints in user stories");
-    }
-
-    @Override
     public void addUserStory(UserStoryPostDto userStoryPostDto, Long sprintId) {
         UserStory userStory = userStoryMapper.convertDtoToUserStory(userStoryPostDto);
-        if(userStory.getStatus() == null)
+        if (userStory.getStatus() == null)
             userStory.setStatus(UserStoryStatus.TO_DO);
         userStoryRepository.save(userStory);
         Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() ->
@@ -63,23 +52,30 @@ public class UserStoryServiceImpl implements UserStoryService{
     }
 
     @Override
-    public Long addUserStory(UserStoryPostDto userStoryPostDto) {
+    public UserStory addUserStory(UserStoryPostDto userStoryPostDto) {
+        if (userStoryPostDto.getName() == null && userStoryPostDto.getDescription() == null)
+            throw new InvalidDataException("Violations of constraints in user stories");
         UserStory userStory = userStoryMapper.convertDtoToUserStory(userStoryPostDto);
-        if(userStory.getStatus() == null)
+        if (userStory.getStatus() == null)
             userStory.setStatus(UserStoryStatus.TO_DO);
-        userStoryRepository.save(userStory);
-        return userStory.getId();
+        return userStoryRepository.save(userStory);
     }
 
     @Override
-    public UserStory getUserStoryById(Long id) {
+    public UserStoryGetDto getUserStoryById(Long id) {
+        return userStoryMapper.getUserStoryGetDtoFromUserStory(userStoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User " +
+                "story with id " + id + " does not exists")));
+    }
+
+    @Override
+    public UserStory getUserStoryEntityById(Long id) {
         return userStoryRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("User " +
                 "story with id " + id + " does not exists"));
     }
 
     @Override
     public List<UserStoryGetDto> getUsersStoriesBySprintId(Long id) {
-        if(!sprintRepository.existsById(id))
+        if (!sprintRepository.existsById(id))
             throw new EntityNotFoundException(String.format("Sprint with id %d does not exists", id));
         return userStoryRepository.getUserStoriesBySprintId(id)
                 .stream()
@@ -105,6 +101,7 @@ public class UserStoryServiceImpl implements UserStoryService{
     }
 
     @Override
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
     public UserStoryGetDto findUserStoryByName(String name) {
         return userStoryMapper
                 .getUserStoryGetDtoFromUserStory
@@ -114,7 +111,7 @@ public class UserStoryServiceImpl implements UserStoryService{
     @Override
     public AttachmentGetDto getUserStoryAttachment(Long userStoryId, Integer attachmentNumber) {
         List<Attachment> attachments = getUserStoryById(userStoryId).getAttachments();
-        if(!attachments.isEmpty() && attachments.size() >= attachmentNumber)
+        if (!attachments.isEmpty() && attachments.size() >= attachmentNumber)
             return attachmentMapper.getDtoFromAttachment(attachments.get(attachmentNumber - 1));
         throw new InvalidDataException("User story does not have any attachments" +
                 " or attachment with this number does not exists");
@@ -122,9 +119,11 @@ public class UserStoryServiceImpl implements UserStoryService{
 
     @Override
     public void uploadUserStoryAttachment(Long userStoryId, MultipartFile file) {
-        if(file == null)
+        if (file == null)
             throw new InvalidDataException("No file provided");
-        UserStory userStory = getUserStoryById(userStoryId);
+        UserStory userStory = userStoryRepository.findById(userStoryId)
+                .orElseThrow(() -> new EntityNotFoundException(String
+                        .format("User story with id %d does not exists", userStoryId)));
         List<Attachment> attachments = userStory.getAttachments();
         try {
             Attachment attachment = new Attachment();
@@ -135,32 +134,32 @@ public class UserStoryServiceImpl implements UserStoryService{
             attachments.add(attachment);
             userStory.setAttachments(attachments);
             userStoryRepository.save(userStory);
-        } catch(IOException exception) {
+        } catch (IOException exception) {
             throw new RuntimeException(exception);
         }
     }
 
     @Override
     public void deleteUserStoryById(Long id) {
-        if(!userStoryRepository.existsById(id))
+        if (!userStoryRepository.existsById(id))
             throw new EntityNotFoundException(String.format("User story with id %d does not exists", id));
         userStoryRepository.deleteById(id);
     }
 
     @Transactional(rollbackFor = InvalidDataException.class)
     public void addUserStories() throws InvalidDataException {
-        UserStory userStory = new UserStory();
+        UserStoryPostDto userStory = new UserStoryPostDto();
         userStory.setName("User story");
         userStory.setStoryPoints(15);
         userStory.setDescription("This is another user story");
         userStory.setStatus(UserStoryStatus.DONE);
 
-        UserStory userStory1 = new UserStory();
+        UserStoryPostDto userStory1 = new UserStoryPostDto();
         userStory1.setName("User story1");
         userStory1.setStoryPoints(54);
         userStory1.setDescription("This is yet another user story");
 
-        UserStory userStory2 = new UserStory();
+        UserStoryPostDto userStory2 = new UserStoryPostDto();
         userStory2.setName("User story2");
         userStory2.setDescription("This is another another user story");
         userStory2.setStatus(UserStoryStatus.IN_PROGRESS);
@@ -174,7 +173,7 @@ public class UserStoryServiceImpl implements UserStoryService{
         try {
             log.info("Creating user stories...");
             addUserStories();
-        } catch(Exception exception) {
+        } catch (Exception exception) {
             log.info("Error occurred while adding user story to db");
         }
     }

@@ -14,9 +14,8 @@ public class UserStoryGetDto implements Serializable {
 
     private String name;
     private Integer storyPoints;
-
     private UserStoryStatus status;
+    private String description;
     private List<SprintGetDto> sprints;
-  //  private byte[] attachments;
     private List<Attachment> attachments;
 }

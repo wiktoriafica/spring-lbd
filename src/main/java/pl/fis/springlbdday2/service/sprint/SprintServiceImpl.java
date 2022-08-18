@@ -4,12 +4,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.fis.springlbdday2.dto.sprint.SprintGetDto;
 import pl.fis.springlbdday2.dto.sprint.SprintMapper;
 import pl.fis.springlbdday2.dto.sprint.SprintPostDto;
+import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
+import pl.fis.springlbdday2.dto.userstory.UserStoryMapper;
+import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
 import pl.fis.springlbdday2.entity.enums.SprintStatus;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
@@ -34,8 +38,9 @@ public class SprintServiceImpl implements SprintService {
     private final SprintRepository sprintRepository;
     private final UserStoryService userStoryService;
     private final SprintMapper sprintMapper;
+    private final UserStoryMapper userStoryMapper;
 
-    private void validateSprint(Sprint sprint) {
+    private void validateSprint(SprintPostDto sprint) {
         if (sprint.getStartDate() == null || sprint.getEndDate() == null ||
                 sprint.getStatus() == null || sprint.getName() == null)
             throw new InvalidDataException("No necessary sprint data provided");
@@ -47,21 +52,22 @@ public class SprintServiceImpl implements SprintService {
 
     @Override
     @Transactional(rollbackFor = InvalidDataException.class)
-    public void addSprint(Sprint sprint) throws InvalidDataException {
+    public Sprint addSprint(SprintPostDto sprint) throws InvalidDataException {
         validateSprint(sprint);
-        sprintRepository.save(sprint);
+        Sprint sprintToAdd = sprintMapper.sprintPostDtoToSprint(sprint);
+        return sprintRepository.save(sprintToAdd);
     }
 
     @Override
     @Transactional(rollbackFor = InvalidDataException.class)
     public void addSprintWithUserStories() throws InvalidDataException {
-        UserStory userStory1 = new UserStory();
+        UserStoryPostDto userStory1 = new UserStoryPostDto();
         userStory1.setStoryPoints(12);
         userStory1.setName("Story 1");
         userStory1.setDescription("This is user story 1");
         userStory1.setStatus(UserStoryStatus.IN_PROGRESS);
 
-        UserStory userStory2 = new UserStory();
+        UserStoryPostDto userStory2 = new UserStoryPostDto();
         userStory2.setStoryPoints(23);
         userStory2.setName("Story 2");
         userStory2.setDescription("This is user story 2");
@@ -74,23 +80,32 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    public Sprint getSprintById(Long id) {
-        return sprintRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity " +
-                "with id " + id + " does not exists"));
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
+    public SprintGetDto getSprintById(Long id) {
+        return sprintMapper.getDtoFromSprintWithUserStories(sprintRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Entity " +
+                "with id " + id + " does not exists")));
     }
 
     @Override
     @Transactional
-    public List<UserStory> getUsersStoriesBySprintId(Long id) {
-        return sprintRepository.findUserStoriesBySprintId(id);
+    public List<UserStoryGetDto> getUsersStoriesBySprintId(Long id) {
+        return sprintRepository.findUserStoriesBySprintId(id)
+                .stream()
+                .map(userStoryMapper::getUserStoryGetDtoFromUserStory)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<Sprint> getSprintsFromGivenTime(LocalDate startDate, LocalDate endDate) {
-        return sprintRepository.findByStartDateBetween(startDate, endDate);
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
+    public List<SprintGetDto> getSprintsFromGivenTime(LocalDate startDate, LocalDate endDate) {
+        return sprintRepository.findByStartDateBetween(startDate, endDate)
+                .stream()
+                .map(sprintMapper::getDtoFromSprintWithUserStories)
+                .collect(Collectors.toList());
     }
 
     @Override
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
     public List<SprintGetDto> getSprintsFromGivenTime(String startDate, String endDate) {
         try {
             LocalDate start = LocalDate.parse(startDate);
@@ -119,8 +134,13 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
-    public Page<Sprint> getPaginatedAndSortedSprints(Pageable page) {
-        return sprintRepository.findAll(page);
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
+    public Page<SprintGetDto> getPaginatedAndSortedSprints(Pageable page) {
+        return new PageImpl<>(sprintRepository
+                .findAll(page)
+                .stream()
+                .map(sprintMapper::getDtoFromSprintWithUserStories)
+                .collect(Collectors.toList()));
     }
 
     @Override
@@ -129,6 +149,7 @@ public class SprintServiceImpl implements SprintService {
     }
 
     @Override
+    @Transactional(readOnly = true, noRollbackFor = Exception.class)
     public List<SprintGetDto> getSprints(boolean tasks) {
         return sprintRepository
                 .findAll()
@@ -150,7 +171,7 @@ public class SprintServiceImpl implements SprintService {
     @EventListener
     public void userStoryCreatedEventHandler(UserStoryCreatedEvent userStoryCreatedEvent) {
         Sprint latestSprint = sprintRepository.getNewestPendingSprint();
-        UserStory userStory = userStoryService.getUserStoryById(userStoryCreatedEvent.getUserCreatedStoryId());
+        UserStory userStory = userStoryService.getUserStoryEntityById(userStoryCreatedEvent.getUserCreatedStoryId());
         List<UserStory> userStories = sprintRepository.findUserStoriesBySprintId(latestSprint.getId());
         userStories.add(userStory);
         latestSprint.setUserStories(userStories);
@@ -159,15 +180,15 @@ public class SprintServiceImpl implements SprintService {
 
     @Transactional(rollbackFor = InvalidDataException.class)
     public void addSprints() throws InvalidDataException {
-        Sprint sprint = new Sprint();
+        SprintPostDto sprint = new SprintPostDto();
         sprint.setStartDate(LocalDate.now());
         sprint.setEndDate(LocalDate.now().plusDays(14));
         sprint.setStatus(SprintStatus.PENDING);
         sprint.setName("Another sprint");
-        Sprint sprint1 = new Sprint();
+        SprintPostDto sprint1 = new SprintPostDto();
         sprint1.setStartDate(LocalDate.now());
         sprint1.setEndDate(LocalDate.now().minusDays(14));
-        Sprint sprint2 = new Sprint();
+        SprintPostDto sprint2 = new SprintPostDto();
         sprint2.setEndDate(LocalDate.now().minusDays(14));
         sprint2.setName("And another sprint");
         addSprint(sprint);

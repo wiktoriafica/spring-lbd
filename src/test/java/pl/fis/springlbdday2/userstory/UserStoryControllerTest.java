@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import pl.fis.springlbdday2.controller.userstory.UserStoryController;
+import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
 import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
-import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.service.sprint.SprintService;
 import pl.fis.springlbdday2.service.userstory.UserStoryService;
 
@@ -36,7 +36,7 @@ public class UserStoryControllerTest {
         userStoryController.addUserStory(userStoryPostDto, 3L);
 
         Long id = userStoryService.findUserStoryByName(userStoryPostDto.getName()).getId();
-        List<UserStory> userStories = sprintService.getUsersStoriesBySprintId(3L);
+        List<UserStoryGetDto> userStories = sprintService.getUsersStoriesBySprintId(3L);
 
         assertEquals(id, userStories.get(userStories.size() - 1).getId());
     }
@@ -54,7 +54,7 @@ public class UserStoryControllerTest {
         userStoryController.deleteUserStory(id);
 
         EntityNotFoundException exception = assertThrows(EntityNotFoundException.class, () -> {
-            UserStory userStory = userStoryService.getUserStoryById(id);
+            UserStoryGetDto userStory = userStoryService.getUserStoryById(id);
         });
     }
 }

@@ -10,12 +10,16 @@ import pl.fis.springlbdday2.entity.userstory.UserStory;
 import java.util.List;
 
 public interface UserStoryService {
-    UserStory addUserStory(UserStory userStory);
     void addUserStory(UserStoryPostDto userStoryPostDto, Long sprintId);
-    Long addUserStory(UserStoryPostDto userStoryPostDto);
-    UserStory getUserStoryById(Long id);
+
+    UserStory addUserStory(UserStoryPostDto userStoryPostDto);
+
+    UserStoryGetDto getUserStoryById(Long id);
+
+    UserStory getUserStoryEntityById(Long id);
 
     void deleteUserStoryById(Long id);
+
     List<UserStoryGetDto> getUsersStoriesBySprintId(Long id);
 
     List<UserStoryGetDto> getUserStories();
