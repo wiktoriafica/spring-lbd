@@ -122,6 +122,8 @@ public class UserStoryServiceImpl implements UserStoryService{
 
     @Override
     public void uploadUserStoryAttachment(Long userStoryId, MultipartFile file) {
+        if(file == null)
+            throw new InvalidDataException("No file provided");
         UserStory userStory = getUserStoryById(userStoryId);
         List<Attachment> attachments = userStory.getAttachments();
         try {
