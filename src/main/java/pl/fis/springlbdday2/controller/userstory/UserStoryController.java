@@ -8,6 +8,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import pl.fis.springlbdday2.dto.attachment.AttachmentGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
@@ -42,6 +43,12 @@ public class UserStoryController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + attachment.getFileName())
                 .contentType(MediaType.valueOf(attachment.getContentType()))
                 .body(attachment.getAttachment());
+    }
+
+    @PostMapping(path = "/{userStoryId}/attachments", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> uploadUserStoryAttachment(@PathVariable Long userStoryId, @RequestParam MultipartFile file) {
+        userStoryService.uploadUserStoryAttachment(userStoryId, file);
+        return ResponseEntity.ok().build();
     }
 
 

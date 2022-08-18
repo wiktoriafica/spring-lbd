@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 import pl.fis.springlbdday2.dto.attachment.AttachmentGetDto;
 import pl.fis.springlbdday2.dto.attachment.AttachmentMapper;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
@@ -15,13 +17,13 @@ import pl.fis.springlbdday2.entity.enums.UserStoryStatus;
 import pl.fis.springlbdday2.entity.sprint.Sprint;
 import pl.fis.springlbdday2.entity.userstory.UserStory;
 import pl.fis.springlbdday2.exception.InvalidDataException;
+import pl.fis.springlbdday2.repository.attachment.AttachmentRepository;
 import pl.fis.springlbdday2.repository.sprint.SprintRepository;
 import pl.fis.springlbdday2.repository.userstory.UserStoryRepository;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.EntityNotFoundException;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,7 @@ public class UserStoryServiceImpl implements UserStoryService{
     private final UserStoryMapper userStoryMapper;
     private final SprintRepository sprintRepository;
     private final AttachmentMapper attachmentMapper;
+    private final AttachmentRepository attachmentRepository;
 
     @Override
     public UserStory addUserStory(UserStory userStory) throws InvalidDataException {
@@ -115,6 +118,24 @@ public class UserStoryServiceImpl implements UserStoryService{
             return attachmentMapper.getDtoFromAttachment(attachments.get(attachmentNumber - 1));
         throw new InvalidDataException("User story does not have any attachments" +
                 " or attachment with this number does not exists");
+    }
+
+    @Override
+    public void uploadUserStoryAttachment(Long userStoryId, MultipartFile file) {
+        UserStory userStory = getUserStoryById(userStoryId);
+        List<Attachment> attachments = userStory.getAttachments();
+        try {
+            Attachment attachment = new Attachment();
+            attachment.setFileName(StringUtils.cleanPath(file.getOriginalFilename()));
+            attachment.setContentType(file.getContentType());
+            attachment.setAttachment(file.getBytes());
+            attachmentRepository.save(attachment);
+            attachments.add(attachment);
+            userStory.setAttachments(attachments);
+            userStoryRepository.save(userStory);
+        } catch(IOException exception) {
+            throw new RuntimeException(exception);
+        }
     }
 
     @Override

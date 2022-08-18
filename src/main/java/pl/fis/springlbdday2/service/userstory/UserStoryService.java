@@ -1,6 +1,7 @@
 package pl.fis.springlbdday2.service.userstory;
 
 import org.springframework.data.domain.Pageable;
+import org.springframework.web.multipart.MultipartFile;
 import pl.fis.springlbdday2.dto.attachment.AttachmentGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryGetDto;
 import pl.fis.springlbdday2.dto.userstory.UserStoryPostDto;
@@ -24,4 +25,6 @@ public interface UserStoryService {
     UserStoryGetDto findUserStoryByName(String name);
 
     AttachmentGetDto getUserStoryAttachment(Long userStoryId, Integer attachmentNumber);
+
+    void uploadUserStoryAttachment(Long userStoryId, MultipartFile file);
 }
