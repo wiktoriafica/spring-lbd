@@ -11,7 +11,7 @@ CREATE TABLE IF NOT EXISTS sprints
     start_date       date        NOT NULL,
     end_date         date        NOT NULL,
     goal_description text,
-    sprint_status    varchar(50) NOT NULL
+    sprint_status    ENUM('PENDING', 'IN_PROGRESS', 'FINISHED', 'CANCELED') NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_stories
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS user_stories
     name              varchar(50) NOT NULL UNIQUE,
     description       text        NOT NULL,
     story_points      int,
-    user_story_status varchar(50) NOT NULL
+    user_story_status ENUM('TO_DO', 'IN_PROGRESS', 'REVIEW', 'DONE') NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS user_stories_in_sprints
